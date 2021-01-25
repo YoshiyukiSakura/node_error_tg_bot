@@ -5,7 +5,9 @@ const env = require('dotenv').config().parsed;
 
 // replace the value below with the Telegram token you receive from @BotFather
 const token = env.TOKEN;
-var fileSize = 0;
+var fileSizeApi = 0;
+var fileSizeTrack = 0;
+var fileSizeCallback = 0;
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
 
@@ -19,10 +21,28 @@ bot.on('message', (msg) => {
 });
 
 setInterval(async () => {
-    var errors = await readLastLines.read(env.PATH, 5);
+    var errors = await readLastLines.read(env.PATH_ZERO_CONF, 5);
     var stats = fs.statSync(env.PATH)
-    if (stats.size !== fileSize) {
-        bot.sendMessage(env.XIN, 'a new error:' + errors);
+    if (stats.size !== fileSizeApi) {
+        bot.sendMessage(env.XIN, 'zero_conf api new error:' + errors);
     }
-    fileSize = stats.size
+    fileSizeApi = stats.size
+}, 1000)
+
+setInterval(async () => {
+    var errors = await readLastLines.read(env.PATH_TRACK, 5);
+    var stats = fs.statSync(env.PATH)
+    if (stats.size !== fileSizeTrack) {
+        bot.sendMessage(env.XIN, 'zero_conf tracker new error:' + errors);
+    }
+    fileSizeTrack = stats.size
+}, 1000)
+
+setInterval(async () => {
+    var errors = await readLastLines.read(env.PATH_CALLBACK, 5);
+    var stats = fs.statSync(env.PATH)
+    if (stats.size !== fileSizeCallback) {
+        bot.sendMessage(env.XIN, 'zero_conf callback new error:' + errors);
+    }
+    fileSizeCallback = stats.size
 }, 1000)
